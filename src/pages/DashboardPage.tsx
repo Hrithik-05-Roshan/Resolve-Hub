@@ -1,0 +1,328 @@
+import React from 'react';
+import {
+  Sparkles,
+  PlusCircle,
+  TrendingUp,
+  CheckCircle2,
+  Clock,
+  AlertTriangle,
+  IndianRupee,
+  Zap,
+  Layers,
+  ArrowRight,
+  ShieldCheck,
+  Bot,
+} from 'lucide-react';
+import { useApp } from '../context/AppContext';
+import { DemoScenarioBar } from '../components/common/DemoScenarioBar';
+import { PlatformBadge } from '../components/common/PlatformBadge';
+
+export const DashboardPage: React.FC = () => {
+  const { currentUser, platforms, issues, navigate, setActiveIssue } = useApp();
+
+  const totalIssues = issues.length + 20; // 24 total
+  const resolvedCount = issues.filter((i) => i.status === 'resolved').length + 18; // 21
+  const inProgressCount = 2;
+  const escalatedCount = issues.filter((i) => i.status === 'escalated').length; // 1
+
+  const moneyRecovered = issues.reduce((acc, i) => acc + (i.refundAmount || 0), 0) + 1240; // ₹4,280 total
+
+  const connectedPlatforms = platforms.filter((p) => p.connected);
+
+  const handleOpenIssue = (issue: any) => {
+    setActiveIssue(issue);
+    navigate('resolution_center');
+  };
+
+  return (
+    <div className="space-y-6 pb-12">
+      {/* Top Welcome Banner */}
+      <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-indigo-950/80 via-slate-900 to-violet-950/80 border border-indigo-500/30 shadow-2xl flex flex-col md:flex-row md:items-center justify-between gap-6 relative overflow-hidden">
+        <div className="space-y-2 relative z-10">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-xs font-medium">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+            <span>AI Resolution Engine Operational</span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+            Good morning, {currentUser.name}
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-300">
+            Your AI resolution agent is ready to investigate, execute, and verify customer disputes automatically.
+          </p>
+        </div>
+
+        <button
+          onClick={() => navigate('raise_issue')}
+          className="py-3 px-6 rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white text-xs font-bold shadow-xl shadow-indigo-600/30 transition-all flex items-center justify-center gap-2 shrink-0 cursor-pointer active:scale-95"
+        >
+          <PlusCircle className="w-4 h-4" />
+          <span>Raise a new issue</span>
+        </button>
+      </div>
+
+      {/* Statistics Cards Grid */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
+        <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 shadow-md">
+          <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 block">
+            Total Issues
+          </span>
+          <span className="text-2xl font-black text-slate-100 font-mono mt-1 block">
+            {totalIssues}
+          </span>
+        </div>
+
+        <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 shadow-md">
+          <span className="text-[11px] font-semibold uppercase tracking-wider text-emerald-400 block flex items-center gap-1">
+            <CheckCircle2 className="w-3 h-3" /> Resolved
+          </span>
+          <span className="text-2xl font-black text-emerald-400 font-mono mt-1 block">
+            {resolvedCount}
+          </span>
+        </div>
+
+        <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 shadow-md">
+          <span className="text-[11px] font-semibold uppercase tracking-wider text-indigo-400 block flex items-center gap-1">
+            <Clock className="w-3 h-3" /> In Progress
+          </span>
+          <span className="text-2xl font-black text-indigo-400 font-mono mt-1 block">
+            {inProgressCount}
+          </span>
+        </div>
+
+        <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 shadow-md">
+          <span className="text-[11px] font-semibold uppercase tracking-wider text-amber-400 block flex items-center gap-1">
+            <AlertTriangle className="w-3 h-3" /> Escalated
+          </span>
+          <span className="text-2xl font-black text-amber-400 font-mono mt-1 block">
+            {escalatedCount}
+          </span>
+        </div>
+
+        <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 shadow-md">
+          <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 block">
+            AI Resolution
+          </span>
+          <span className="text-2xl font-black text-slate-100 font-mono mt-1 block">
+            87.5%
+          </span>
+        </div>
+
+        <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 shadow-md">
+          <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 block">
+            Avg Time
+          </span>
+          <span className="text-2xl font-black text-slate-100 font-mono mt-1 block">
+            42 sec
+          </span>
+        </div>
+
+        <div className="col-span-2 sm:col-span-1 p-4 rounded-2xl bg-emerald-950/40 border border-emerald-500/30 shadow-md">
+          <span className="text-[11px] font-semibold uppercase tracking-wider text-emerald-400 block flex items-center gap-1">
+            <IndianRupee className="w-3 h-3" /> Recovered
+          </span>
+          <span className="text-2xl font-black text-emerald-400 font-mono mt-1 block">
+            ₹{moneyRecovered.toLocaleString('en-IN')}
+          </span>
+        </div>
+      </div>
+
+      {/* Interactive Demo Scenarios Bar */}
+      <DemoScenarioBar />
+
+      {/* Main Grid: AI Activity Feed & Connected Platforms */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left Column: AI Activity Feed */}
+        <div className="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+            <div className="flex items-center gap-2">
+              <div className="p-2 rounded-xl bg-indigo-500/15 text-indigo-400 border border-indigo-500/20">
+                <Zap className="w-4 h-4" />
+              </div>
+              <div>
+                <h3 className="font-bold text-slate-100 text-sm">Autonomous AI Activity Feed</h3>
+                <p className="text-xs text-slate-400">Live stream of tool executions & verified resolutions</p>
+              </div>
+            </div>
+            <button
+              onClick={() => navigate('audit_log')}
+              className="text-xs font-semibold text-indigo-400 hover:text-indigo-300 flex items-center gap-1 cursor-pointer"
+            >
+              <span>View Audit Trail</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+
+          <div className="space-y-3">
+            {issues.map((issue) => (
+              <div
+                key={issue.issueId}
+                onClick={() => handleOpenIssue(issue)}
+                className="p-4 rounded-2xl bg-slate-950/80 hover:bg-slate-950 border border-slate-800/80 hover:border-indigo-500/40 transition-all cursor-pointer flex items-center justify-between gap-4 group"
+              >
+                <div className="flex items-center gap-3.5 min-w-0">
+                  <div
+                    className={`w-2.5 h-2.5 rounded-full shrink-0 ${
+                      issue.requiresHuman || issue.status === 'escalated'
+                        ? 'bg-red-500 animate-pulse shadow-sm shadow-red-500/50'
+                        : issue.status === 'resolved'
+                        ? 'bg-emerald-400 shadow-sm shadow-emerald-500/50'
+                        : 'bg-indigo-400 animate-ping'
+                    }`}
+                  />
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span
+                        className={`font-semibold text-xs transition-colors ${
+                          issue.requiresHuman || issue.status === 'escalated'
+                            ? 'text-red-300 group-hover:text-red-200'
+                            : 'text-slate-200 group-hover:text-indigo-300'
+                        }`}
+                      >
+                        {issue.requiresHuman || issue.status === 'escalated'
+                          ? '⚠️ Manual Review Required'
+                          : issue.issueType === 'missing_item'
+                          ? 'Refund Initiated'
+                          : issue.issueType === 'damaged_product'
+                          ? 'Replacement Requested'
+                          : issue.issueType === 'duplicate_payment'
+                          ? 'Duplicate Charge Reversed'
+                          : 'Order Investigated'}
+                      </span>
+                      <PlatformBadge platform={issue.platform} size="sm" />
+                      {issue.refundAmount ? (
+                        <span className="font-mono text-xs font-bold text-emerald-400">
+                          ₹{issue.refundAmount.toLocaleString('en-IN')}
+                        </span>
+                      ) : null}
+                    </div>
+                    <p className="text-xs text-slate-400 mt-1 line-clamp-1">
+                      {issue.description}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="text-right shrink-0">
+                  <span className="text-[11px] font-mono text-slate-400 block">
+                    {issue.resolvedAt || issue.createdAt}
+                  </span>
+                  <span className="text-[10px] text-indigo-400 font-semibold group-hover:underline">
+                    Inspect Trace →
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Right Column: Connected Platforms & AI Insights */}
+        <div className="space-y-6">
+          {/* Connected Platforms Widget */}
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+              <div className="flex items-center gap-2">
+                <Layers className="w-4 h-4 text-purple-400" />
+                <h3 className="font-bold text-slate-100 text-sm">CONNECTED PLATFORMS</h3>
+              </div>
+              <button
+                onClick={() => navigate('connections')}
+                className="text-xs text-indigo-400 font-medium hover:underline cursor-pointer"
+              >
+                Manage
+              </button>
+            </div>
+
+            <div className="space-y-2.5">
+              {platforms.map((p) => (
+                <div
+                  key={p.platformId}
+                  className="p-3 rounded-xl bg-slate-950 border border-slate-800/80 flex items-center justify-between text-xs"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <PlatformBadge platform={p.platformId} size="sm" />
+                    <div>
+                      <span className="font-semibold text-slate-200 block">{p.name}</span>
+                      <span className="text-[10px] text-slate-400">{p.category}</span>
+                    </div>
+                  </div>
+
+                  <span
+                    className={`px-2 py-0.5 rounded text-[10px] font-mono font-semibold ${
+                      p.connected
+                        ? 'bg-emerald-950 text-emerald-400 border border-emerald-800'
+                        : 'bg-slate-900 text-slate-500 border border-slate-800'
+                    }`}
+                  >
+                    {p.connected ? 'Connected' : 'Not Connected'}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* AI Insights Widget */}
+          <div className="bg-gradient-to-b from-indigo-950/40 to-slate-900 border border-indigo-500/20 rounded-3xl p-6 shadow-xl space-y-4 text-xs">
+            <div className="flex items-center gap-2 text-indigo-300 font-bold text-sm">
+              <Bot className="w-4 h-4 text-indigo-400" />
+              <span>AI AGENT INSIGHTS</span>
+            </div>
+
+            <p className="text-slate-300 leading-relaxed">
+              You recovered <strong className="text-emerald-400 font-mono">₹4,280</strong> through automatic resolutions this month across 4 platforms.
+            </p>
+
+            <div className="space-y-2 pt-2 border-t border-slate-800">
+              <div className="flex justify-between text-slate-400">
+                <span>Most Common Issue:</span>
+                <span className="font-semibold text-slate-200">Missing Items (34%)</span>
+              </div>
+              <div className="flex justify-between text-slate-400">
+                <span>Avg Resolution Time:</span>
+                <span className="font-mono font-semibold text-slate-200">42 seconds</span>
+              </div>
+              <div className="flex justify-between text-slate-400">
+                <span>Human Escalation Rate:</span>
+                <span className="font-mono font-semibold text-slate-200">8.3%</span>
+              </div>
+            </div>
+
+            {/* Issue Breakdown progress bars */}
+            <div className="pt-3 space-y-1.5">
+              <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2">
+                Top Issue Types
+              </div>
+              <div>
+                <div className="flex justify-between text-[11px] text-slate-400">
+                  <span>Missing Item</span>
+                  <span className="font-mono text-slate-300">34%</span>
+                </div>
+                <div className="w-full bg-slate-950 rounded-full h-1 mt-0.5">
+                  <div className="bg-indigo-500 h-full rounded-full" style={{ width: '34%' }} />
+                </div>
+              </div>
+
+              <div>
+                <div className="flex justify-between text-[11px] text-slate-400">
+                  <span>Refund Request</span>
+                  <span className="font-mono text-slate-300">26%</span>
+                </div>
+                <div className="w-full bg-slate-950 rounded-full h-1 mt-0.5">
+                  <div className="bg-indigo-500 h-full rounded-full" style={{ width: '26%' }} />
+                </div>
+              </div>
+
+              <div>
+                <div className="flex justify-between text-[11px] text-slate-400">
+                  <span>Damaged Product</span>
+                  <span className="font-mono text-slate-300">18%</span>
+                </div>
+                <div className="w-full bg-slate-950 rounded-full h-1 mt-0.5">
+                  <div className="bg-indigo-500 h-full rounded-full" style={{ width: '18%' }} />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};

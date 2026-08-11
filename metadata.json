@@ -1,0 +1,6 @@
+{
+  "name": "ResolveHub",
+  "description": "Universal AI Resolution Engine that investigates, decides, executes, verifies, and resolves customer issues across connected platforms.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,167 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User account settings and profile preferences",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "name": { "type": "string", "maxLength": 128 },
+        "email": { "type": "string", "maxLength": 256 },
+        "connectedPlatformsCount": { "type": "number" },
+        "autoRefundThreshold": { "type": "number" },
+        "notificationsEnabled": { "type": "boolean" },
+        "autoExecuteEnabled": { "type": "boolean" },
+        "humanEscalationEnabled": { "type": "boolean" }
+      },
+      "required": ["id", "name", "email"]
+    },
+    "Platform": {
+      "title": "Platform",
+      "description": "Connected third-party platform configuration",
+      "type": "object",
+      "properties": {
+        "platformId": { "type": "string", "maxLength": 64 },
+        "name": { "type": "string", "maxLength": 128 },
+        "category": { "type": "string", "maxLength": 64 },
+        "icon": { "type": "string", "maxLength": 64 },
+        "connected": { "type": "boolean" },
+        "syncStatus": { "type": "string", "maxLength": 64 },
+        "lastSynced": { "type": "string", "maxLength": 128 },
+        "orderCount": { "type": "number" },
+        "totalSpent": { "type": "number" }
+      },
+      "required": ["platformId", "name", "category", "connected"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "Order records fetched from connected platforms",
+      "type": "object",
+      "properties": {
+        "orderId": { "type": "string", "maxLength": 128 },
+        "platform": { "type": "string", "maxLength": 64 },
+        "platformName": { "type": "string", "maxLength": 128 },
+        "items": { "type": "array" },
+        "amount": { "type": "number" },
+        "currency": { "type": "string", "maxLength": 16 },
+        "paymentStatus": { "type": "string", "maxLength": 64 },
+        "paymentMethod": { "type": "string", "maxLength": 128 },
+        "deliveryStatus": { "type": "string", "maxLength": 64 },
+        "date": { "type": "string", "maxLength": 128 },
+        "refundEligible": { "type": "boolean" },
+        "returnEligible": { "type": "boolean" },
+        "trackingNumber": { "type": "string", "maxLength": 128 },
+        "deliveryTimeMinutes": { "type": "number" },
+        "vendorName": { "type": "string", "maxLength": 128 }
+      },
+      "required": ["orderId", "platform", "amount", "paymentStatus", "deliveryStatus", "date"]
+    },
+    "Issue": {
+      "title": "Issue",
+      "description": "Customer resolution request ticket and execution trail",
+      "type": "object",
+      "properties": {
+        "issueId": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "platform": { "type": "string", "maxLength": 64 },
+        "orderId": { "type": "string", "maxLength": 128 },
+        "description": { "type": "string", "maxLength": 2000 },
+        "issueType": { "type": "string", "maxLength": 64 },
+        "status": { "type": "string", "maxLength": 64 },
+        "resolution": { "type": "string", "maxLength": 2000 },
+        "confidence": { "type": "number" },
+        "confidenceBreakdown": { "type": "object" },
+        "refundAmount": { "type": "number" },
+        "requiresHuman": { "type": "boolean" },
+        "escalationReason": { "type": "string", "maxLength": 1000 },
+        "escalationTicket": { "type": "string", "maxLength": 128 },
+        "createdAt": { "type": "string", "maxLength": 128 },
+        "resolvedAt": { "type": "string", "maxLength": 128 },
+        "actions": { "type": "array" }
+      },
+      "required": ["issueId", "userId", "platform", "description", "issueType", "status", "createdAt"]
+    },
+    "AuditLogEntry": {
+      "title": "AuditLogEntry",
+      "description": "Audit trail log for all actions performed by user, AI, or tools",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "issueId": { "type": "string", "maxLength": 128 },
+        "timestamp": { "type": "string", "maxLength": 128 },
+        "actor": { "type": "string", "maxLength": 64 },
+        "action": { "type": "string", "maxLength": 500 },
+        "input": { "type": "string", "maxLength": 2000 },
+        "output": { "type": "string", "maxLength": 2000 },
+        "status": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["id", "timestamp", "actor", "action", "status"]
+    },
+    "AppNotification": {
+      "title": "AppNotification",
+      "description": "In-app notifications for resolution events and updates",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "title": { "type": "string", "maxLength": 256 },
+        "message": { "type": "string", "maxLength": 1000 },
+        "type": { "type": "string", "maxLength": 64 },
+        "timestamp": { "type": "string", "maxLength": 128 },
+        "read": { "type": "boolean" },
+        "issueId": { "type": "string", "maxLength": 128 },
+        "amount": { "type": "number" }
+      },
+      "required": ["id", "title", "message", "type", "timestamp", "read"]
+    },
+    "ConnectedAccount": {
+      "title": "ConnectedAccount",
+      "description": "Third-party platform connected account auth and status",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "provider": { "type": "string", "maxLength": 64 },
+        "providerAccountId": { "type": "string", "maxLength": 128 },
+        "storeDomain": { "type": "string", "maxLength": 256 },
+        "accessTokenEncrypted": { "type": "string", "maxLength": 2000 },
+        "refreshTokenEncrypted": { "type": "string", "maxLength": 2000 },
+        "scopes": { "type": "array" },
+        "tokenExpiresAt": { "type": "string", "maxLength": 128 },
+        "status": { "type": "string", "maxLength": 64 },
+        "createdAt": { "type": "string", "maxLength": 128 },
+        "updatedAt": { "type": "string", "maxLength": 128 }
+      },
+      "required": ["id", "userId", "provider", "status", "createdAt", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "User profile settings document"
+    },
+    "/users/{userId}/platforms/{platformId}": {
+      "schema": { "$ref": "#/entities/Platform" },
+      "description": "User connected platform status"
+    },
+    "/users/{userId}/connected_accounts/{accountId}": {
+      "schema": { "$ref": "#/entities/ConnectedAccount" },
+      "description": "User connected accounts subcollection"
+    },
+    "/users/{userId}/orders/{orderId}": {
+      "schema": { "$ref": "#/entities/Order" },
+      "description": "User orders subcollection"
+    },
+    "/users/{userId}/issues/{issueId}": {
+      "schema": { "$ref": "#/entities/Issue" },
+      "description": "User support issues and resolution history"
+    },
+    "/users/{userId}/auditLogs/{logId}": {
+      "schema": { "$ref": "#/entities/AuditLogEntry" },
+      "description": "User action audit logs"
+    },
+    "/users/{userId}/notifications/{notifId}": {
+      "schema": { "$ref": "#/entities/AppNotification" },
+      "description": "User notifications"
+    }
+  }
+}
