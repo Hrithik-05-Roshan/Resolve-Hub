@@ -3,7 +3,7 @@ import { Sparkles, ArrowRight, ShieldCheck, Mail, Lock, LogIn } from 'lucide-rea
 import { useApp } from '../context/AppContext';
 
 export const LoginPage: React.FC = () => {
-  const { loginAsDemo, loginWithGoogleProvider, navigate } = useApp();
+  const { loginAsDemo, loginWithGoogleProvider, loginWithEmail, navigate } = useApp();
   const [email, setEmail] = useState('hrithikrocks124@gmail.com');
   const [password, setPassword] = useState('••••••••••••');
   const [isAuthenticating, setIsAuthenticating] = useState(false);
@@ -17,9 +17,14 @@ export const LoginPage: React.FC = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    loginAsDemo();
+    setIsAuthenticating(true);
+    try {
+      await loginWithEmail(email, password);
+    } finally {
+      setIsAuthenticating(false);
+    }
   };
 
   return (

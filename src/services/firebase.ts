@@ -1,5 +1,14 @@
 import { initializeApp, getApps, getApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, User } from 'firebase/auth';
+import {
+  getAuth,
+  GoogleAuthProvider,
+  signInWithPopup,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+  User,
+} from 'firebase/auth';
 import {
   getFirestore,
   doc,
@@ -12,7 +21,7 @@ import {
   updateDoc,
   deleteDoc,
   query,
-  orderBy
+  orderBy,
 } from 'firebase/firestore';
 import firebaseConfig from '../../firebase-applet-config.json';
 
@@ -22,6 +31,9 @@ export const auth = getAuth(app);
 export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
 
 export const googleProvider = new GoogleAuthProvider();
+googleProvider.setCustomParameters({
+  prompt: 'select_account',
+});
 
 export async function testConnection() {
   try {
@@ -92,11 +104,26 @@ export const signInWithGoogle = async () => {
       error?.code === 'auth/cancelled-popup-request' ||
       error?.code === 'auth/popup-blocked'
     ) {
-      console.info('Google sign-in popup was closed or blocked.');
+      console.info('Google sign-in popup closed or blocked.');
       return null;
     }
     console.error('Google Sign-In Error:', error);
     throw error;
+  }
+};
+
+// Email & Password Auth Helpers
+export const signInWithEmail = async (email: string, pass: string) => {
+  try {
+    const res = await signInWithEmailAndPassword(auth, email, pass);
+    return res.user;
+  } catch (err: any) {
+    if (err?.code === 'auth/user-not-found' || err?.code === 'auth/invalid-credential') {
+      // Try auto-registration for streamlined demo / email login experience
+      const newRes = await createUserWithEmailAndPassword(auth, email, pass);
+      return newRes.user;
+    }
+    throw err;
   }
 };
 
@@ -108,3 +135,4 @@ export const logoutFirebase = async () => {
     throw error;
   }
 };
+

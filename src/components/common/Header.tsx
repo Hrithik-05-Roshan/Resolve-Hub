@@ -49,9 +49,18 @@ export const Header: React.FC = () => {
             onClick={() => setShowUserMenu(!showUserMenu)}
             className="flex items-center gap-2 p-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:border-slate-700 transition-all cursor-pointer"
           >
-            <div className="w-7 h-7 rounded-full bg-indigo-600/30 text-indigo-400 border border-indigo-500/30 flex items-center justify-center font-bold text-xs">
-              {currentUser.name.charAt(0)}
-            </div>
+            {currentUser.photoURL ? (
+              <img
+                src={currentUser.photoURL}
+                alt={currentUser.name}
+                referrerPolicy="no-referrer"
+                className="w-7 h-7 rounded-full object-cover border border-indigo-500/40"
+              />
+            ) : (
+              <div className="w-7 h-7 rounded-full bg-indigo-600/30 text-indigo-400 border border-indigo-500/30 flex items-center justify-center font-bold text-xs">
+                {currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'U'}
+              </div>
+            )}
             <span className="text-xs font-medium text-slate-200 hidden md:inline-block pr-1">
               {currentUser.name}
             </span>
@@ -63,9 +72,16 @@ export const Header: React.FC = () => {
                 className="fixed inset-0 z-40"
                 onClick={() => setShowUserMenu(false)}
               />
-              <div className="absolute right-0 mt-2 w-56 rounded-xl bg-slate-900 border border-slate-800 shadow-2xl p-2 z-50 text-slate-200 text-xs divide-y divide-slate-800">
-                <div className="px-3 py-2">
-                  <p className="font-semibold text-slate-100">{currentUser.name}</p>
+              <div className="absolute right-0 mt-2 w-60 rounded-xl bg-slate-900 border border-slate-800 shadow-2xl p-2 z-50 text-slate-200 text-xs divide-y divide-slate-800">
+                <div className="px-3 py-2.5">
+                  <div className="flex items-center gap-2 mb-1">
+                    <p className="font-semibold text-slate-100 truncate">{currentUser.name}</p>
+                    {currentUser.authProvider === 'google' && (
+                      <span className="px-1.5 py-0.5 rounded bg-indigo-950/80 text-indigo-300 border border-indigo-800/80 text-[9px] font-medium shrink-0">
+                        Google
+                      </span>
+                    )}
+                  </div>
                   <p className="text-[11px] text-slate-400 truncate">{currentUser.email}</p>
                 </div>
 

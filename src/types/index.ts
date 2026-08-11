@@ -135,6 +135,8 @@ export interface UserProfile {
   id: string;
   name: string;
   email: string;
+  photoURL?: string;
+  authProvider?: 'google' | 'email' | 'demo';
   connectedPlatformsCount: number;
   autoRefundThreshold: number; // e.g. 1000 INR
   notificationsEnabled: boolean;

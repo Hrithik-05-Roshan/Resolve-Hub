@@ -24,6 +24,7 @@ import {
   auth,
   db,
   signInWithGoogle,
+  signInWithEmail,
   logoutFirebase,
   testConnection,
   handleFirestoreError,
@@ -65,6 +66,7 @@ interface AppContextType {
   updateSettings: (newSettings: Partial<UserProfile>) => void;
   loginAsDemo: () => void;
   loginWithGoogleProvider: () => Promise<void>;
+  loginWithEmail: (email: string, pass: string) => Promise<void>;
   logout: () => void;
   resetToInitialData: () => void;
   triggerDemoScenario: (scenarioId: string) => Promise<void>;
@@ -153,27 +155,33 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setFirebaseUser(user);
       if (user) {
         setIsLoggedIn(true);
+        const isGoogle = user.providerData?.some((p) => p.providerId.includes('google'));
         const userProfile: UserProfile = {
           id: user.uid,
-          name: user.displayName || 'Hrithik',
+          name: user.displayName || user.email?.split('@')[0] || 'Hrithik',
           email: user.email || 'hrithikrocks124@gmail.com',
+          photoURL: user.photoURL || undefined,
+          authProvider: isGoogle ? 'google' : 'email',
           connectedPlatformsCount: 4,
           autoRefundThreshold: 1000,
           notificationsEnabled: true,
           autoExecuteEnabled: true,
           humanEscalationEnabled: true,
         };
-        setCurrentUser(userProfile);
 
         // Sync or fetch profile from Firestore
         const userDocRef = doc(db, 'users', user.uid);
         try {
           const snap = await getDoc(userDocRef);
-          if (!snap.exists()) {
+          if (snap.exists()) {
+            setCurrentUser({ ...userProfile, ...snap.data() });
+          } else {
             await setDoc(userDocRef, userProfile);
+            setCurrentUser(userProfile);
           }
         } catch (error) {
           console.warn('Firestore User Sync Notice:', error);
+          setCurrentUser(userProfile);
         }
       }
     });
@@ -232,6 +240,19 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         return;
       }
       console.warn('Google Auth notice, switching to demo mode:', error?.message || error);
+      loginAsDemo();
+    }
+  };
+
+  const loginWithEmail = async (email: string, pass: string) => {
+    try {
+      const user = await signInWithEmail(email, pass);
+      if (user) {
+        setIsLoggedIn(true);
+        setActivePage('dashboard');
+      }
+    } catch (error: any) {
+      console.warn('Email auth notice, falling back to instant access:', error);
       loginAsDemo();
     }
   };
@@ -641,6 +662,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         updateSettings,
         loginAsDemo,
         loginWithGoogleProvider,
+        loginWithEmail,
         logout,
         resetToInitialData,
         triggerDemoScenario,
