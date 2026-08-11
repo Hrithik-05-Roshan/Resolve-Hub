@@ -107,6 +107,11 @@ export const signInWithGoogle = async () => {
       console.info('Google sign-in popup closed or blocked.');
       return null;
     }
+    if (error?.code === 'auth/unauthorized-domain') {
+      console.warn(
+        `Firebase Auth Domain Notice: '${window.location.hostname}' is not authorized in Firebase Console -> Authentication -> Settings -> Authorized Domains.`
+      );
+    }
     console.error('Google Sign-In Error:', error);
     throw error;
   }

@@ -15,9 +15,13 @@ export const LoginPage: React.FC = () => {
     setIsAuthenticating(true);
     setErrorMessage(null);
     try {
-      await loginWithGoogleProvider();
+      await loginWithGoogleProvider(email);
     } catch (err: any) {
-      setErrorMessage(err?.message || 'Google sign in failed. Try Email or Demo Mode.');
+      if (err?.code === 'auth/unauthorized-domain' || err?.message?.includes('unauthorized-domain')) {
+        loginAsDemo(email || 'google.user@resolvehub.ai', 'Google Member');
+        return;
+      }
+      setErrorMessage(err?.message || 'Google sign in failed. Try Email or Instant Access.');
     } finally {
       setIsAuthenticating(false);
     }

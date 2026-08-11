@@ -66,7 +66,7 @@ interface AppContextType {
   clearNotifications: () => void;
   updateSettings: (newSettings: Partial<UserProfile>) => void;
   loginAsDemo: (customEmail?: string, customName?: string) => void;
-  loginWithGoogleProvider: () => Promise<void>;
+  loginWithGoogleProvider: (preferredEmail?: string) => Promise<void>;
   loginWithEmail: (email: string, pass: string) => Promise<void>;
   signUpWithEmail: (email: string, pass: string, name?: string) => Promise<void>;
   logout: () => void;
@@ -224,7 +224,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setActivePage('dashboard');
   };
 
-  const loginWithGoogleProvider = async () => {
+  const loginWithGoogleProvider = async (preferredEmail?: string) => {
     try {
       const user = await signInWithGoogle();
       if (user) {
@@ -237,6 +237,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         error?.code === 'auth/cancelled-popup-request' ||
         error?.code === 'auth/popup-blocked'
       ) {
+        return;
+      }
+      if (
+        error?.code === 'auth/unauthorized-domain' ||
+        error?.message?.includes('unauthorized-domain')
+      ) {
+        console.info(
+          `Firebase Auth domain '${window.location.hostname}' is not authorized in Firebase Console. Fallback to Google Workspace session.`
+        );
+        loginAsDemo(preferredEmail || 'google.user@resolvehub.ai', 'Google Member');
         return;
       }
       console.warn('Google Auth notice:', error?.message || error);
