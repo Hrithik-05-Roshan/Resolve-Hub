@@ -16,7 +16,7 @@ const DEFAULT_DISCORD_WEBHOOK =
   'https://discord.com/api/webhooks/1535509672092639232/GGjn-KcKtFz2cKWUQjCdHwPkGvL9ZQTDy9cR5JsD4BkTECrlCDrzGDBv7uyzwrF81Q6k';
 
 export async function postDiscordEscalation(params: DiscordEscalationParams): Promise<boolean> {
-  const webhookUrl = process.env.DISCORD_WEBHOOK_URL || DEFAULT_DISCORD_WEBHOOK;
+  const webhookUrl = process.env.DISCORD_WEBHOOK_URL || process.env.DISCORD_WEBHOOK || DEFAULT_DISCORD_WEBHOOK;
 
   if (!webhookUrl) {
     console.warn('Discord Webhook URL not configured');

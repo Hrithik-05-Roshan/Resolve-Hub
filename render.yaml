@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: resolvehub
+    env: node
+    buildCommand: npm run build
+    startCommand: npm run start
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: DISCORD_WEBHOOK_URL
+        value: https://discord.com/api/webhooks/1535509672092639232/GGjn-KcKtFz2cKWUQjCdHwPkGvL9ZQTDy9cR5JsD4BkTECrlCDrzGDBv7uyzwrF81Q6k

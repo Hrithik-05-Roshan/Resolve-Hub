@@ -9,7 +9,7 @@ import { postDiscordEscalation } from "./server/discordService";
 dotenv.config();
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 
 app.use(express.json());
 
@@ -43,11 +43,12 @@ app.post("/api/escalate-discord", async (req, res) => {
 });
 
 // Initialize Gemini Client safely
+const geminiKey = process.env.GEMINI_API_KEY || process.env.GEMINI_APIKEY;
 let ai: GoogleGenAI | null = null;
-if (process.env.GEMINI_API_KEY) {
+if (geminiKey) {
   try {
     ai = new GoogleGenAI({
-      apiKey: process.env.GEMINI_API_KEY,
+      apiKey: geminiKey,
       httpOptions: {
         headers: {
           "User-Agent": "aistudio-build",
@@ -574,14 +575,20 @@ async function startServer() {
   } else {
     const distPath = path.join(process.cwd(), "dist");
     app.use(express.static(distPath));
+    // 404 handler for unknown API routes in production
+    app.all("/api/*", (req, res) => {
+      res.status(404).json({ error: "API route not found" });
+    });
     app.get("*", (req, res) => {
       res.sendFile(path.join(distPath, "index.html"));
     });
   }
 
   app.listen(PORT, "0.0.0.0", () => {
-    console.log(`ResolveHub Server running on http://0.0.0.0:${PORT}`);
+    console.log(`ResolveHub Server running on port ${PORT}`);
   });
 }
 
 startServer();
+
+export default app;
