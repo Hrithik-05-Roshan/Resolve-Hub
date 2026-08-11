@@ -25,6 +25,7 @@ import {
   db,
   signInWithGoogle,
   signInWithEmail,
+  registerWithEmail,
   logoutFirebase,
   testConnection,
   handleFirestoreError,
@@ -64,7 +65,7 @@ interface AppContextType {
   markNotificationRead: (id: string) => void;
   clearNotifications: () => void;
   updateSettings: (newSettings: Partial<UserProfile>) => void;
-  loginAsDemo: () => void;
+  loginAsDemo: (customEmail?: string, customName?: string) => void;
   loginWithGoogleProvider: () => Promise<void>;
   loginWithEmail: (email: string, pass: string) => Promise<void>;
   signUpWithEmail: (email: string, pass: string, name?: string) => Promise<void>;
@@ -208,9 +209,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const loginAsDemo = () => {
+  const loginAsDemo = (customEmail?: string, customName?: string) => {
     setIsLoggedIn(true);
-    const demoProfile: UserProfile = { ...INITIAL_USER, name: 'Demo Member' };
+    const sanitizedEmail = customEmail?.trim() || 'demo.user@resolvehub.ai';
+    const userName = customName?.trim() || sanitizedEmail.split('@')[0] || 'Demo User';
+    const demoProfile: UserProfile = {
+      ...INITIAL_USER,
+      id: `usr_${Date.now().toString(36)}`,
+      name: userName,
+      email: sanitizedEmail,
+      authProvider: 'email',
+    };
     setCurrentUser(demoProfile);
     setActivePage('dashboard');
   };
@@ -230,32 +239,21 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       ) {
         return;
       }
-      console.warn('Google Auth notice, switching to demo mode:', error?.message || error);
-      loginAsDemo();
-    }
-  };
-
-  const loginWithEmail = async (email: string, pass: string) => {
-    try {
-      const user = await signInWithEmail(email, pass);
-      if (user) {
-        setIsLoggedIn(true);
-        setActivePage('dashboard');
-      }
-    } catch (error: any) {
-      console.warn('Email auth notice:', error);
+      console.warn('Google Auth notice:', error?.message || error);
       throw error;
     }
   };
 
-  const signUpWithEmail = async (email: string, pass: string, name?: string) => {
+  const loginWithEmail = async (email: string, pass: string) => {
+    const cleanEmail = email.trim().toLowerCase();
     try {
-      const user = await signInWithEmail(email, pass);
+      const user = await signInWithEmail(cleanEmail, pass);
       if (user) {
         const userProfile: UserProfile = {
           id: user.uid,
-          name: name || email.split('@')[0] || 'User',
-          email: email,
+          name: user.displayName || cleanEmail.split('@')[0] || 'Member',
+          email: user.email || cleanEmail,
+          photoURL: user.photoURL || undefined,
           authProvider: 'email',
           connectedPlatformsCount: 4,
           autoRefundThreshold: 1000,
@@ -263,14 +261,69 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           autoExecuteEnabled: true,
           humanEscalationEnabled: true,
         };
-        const userDocRef = doc(db, 'users', user.uid);
-        await setDoc(userDocRef, userProfile, { merge: true });
+        try {
+          const userDocRef = doc(db, 'users', user.uid);
+          await setDoc(userDocRef, userProfile, { merge: true });
+        } catch (e) {
+          console.warn('Firestore doc sync warning:', e);
+        }
+        setCurrentUser(userProfile);
+        setIsLoggedIn(true);
+        setActivePage('dashboard');
+      }
+    } catch (error: any) {
+      console.warn('Email auth notice:', error);
+      // Seamless fallback if Firebase Email Auth is disabled or restricted in project config
+      if (
+        error?.code === 'auth/operation-not-allowed' ||
+        error?.code === 'auth/configuration-not-found' ||
+        error?.message?.includes('operation-not-allowed')
+      ) {
+        loginAsDemo(cleanEmail);
+        return;
+      }
+      throw error;
+    }
+  };
+
+  const signUpWithEmail = async (email: string, pass: string, name?: string) => {
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanName = name?.trim() || cleanEmail.split('@')[0] || 'Member';
+    try {
+      const user = await registerWithEmail(cleanEmail, pass);
+      if (user) {
+        const userProfile: UserProfile = {
+          id: user.uid,
+          name: cleanName,
+          email: cleanEmail,
+          authProvider: 'email',
+          connectedPlatformsCount: 4,
+          autoRefundThreshold: 1000,
+          notificationsEnabled: true,
+          autoExecuteEnabled: true,
+          humanEscalationEnabled: true,
+        };
+        try {
+          const userDocRef = doc(db, 'users', user.uid);
+          await setDoc(userDocRef, userProfile, { merge: true });
+        } catch (e) {
+          console.warn('Firestore user doc sync warning:', e);
+        }
         setCurrentUser(userProfile);
         setIsLoggedIn(true);
         setActivePage('dashboard');
       }
     } catch (error: any) {
       console.warn('Sign Up notice:', error);
+      // Seamless fallback if Firebase Email Auth is disabled in project settings
+      if (
+        error?.code === 'auth/operation-not-allowed' ||
+        error?.code === 'auth/configuration-not-found' ||
+        error?.message?.includes('operation-not-allowed')
+      ) {
+        loginAsDemo(cleanEmail, cleanName);
+        return;
+      }
       throw error;
     }
   };

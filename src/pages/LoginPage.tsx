@@ -23,10 +23,18 @@ export const LoginPage: React.FC = () => {
     }
   };
 
+  const handleDemoClick = () => {
+    loginAsDemo(email, name);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password) {
-      setErrorMessage('Please provide both email and password.');
+    if (!email) {
+      setErrorMessage('Please provide an email address.');
+      return;
+    }
+    if (password && password.length < 6) {
+      setErrorMessage('Password must be at least 6 characters long.');
       return;
     }
     setIsAuthenticating(true);
@@ -40,14 +48,15 @@ export const LoginPage: React.FC = () => {
       }
     } catch (err: any) {
       console.warn('Auth Error:', err);
-      // Fallback or friendly message
       if (err?.code === 'auth/wrong-password' || err?.code === 'auth/invalid-credential') {
-        setErrorMessage('Invalid password or credentials. Please verify and try again.');
+        setErrorMessage('Invalid credentials. Please verify your email and password.');
       } else if (err?.code === 'auth/email-already-in-use') {
-        setErrorMessage('An account already exists with this email. Please Sign In instead.');
+        setErrorMessage('An account already exists with this email. Switched to Sign In mode.');
         setAuthMode('signin');
+      } else if (err?.code === 'auth/weak-password') {
+        setErrorMessage('Password is too weak. Please use at least 6 characters.');
       } else {
-        setErrorMessage(err?.message || 'Authentication error. You can also click Enter Demo Mode for instant access.');
+        setErrorMessage(err?.message || 'Authentication failed. Click "Instant Access" below to enter immediately.');
       }
     } finally {
       setIsAuthenticating(false);
@@ -144,11 +153,13 @@ export const LoginPage: React.FC = () => {
 
           <button
             type="button"
-            onClick={loginAsDemo}
+            onClick={handleDemoClick}
             className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white text-xs font-bold shadow-lg shadow-indigo-600/30 transition-all cursor-pointer flex items-center justify-center gap-2"
           >
             <Sparkles className="w-4 h-4 text-indigo-200" />
-            <span>Enter Demo Mode (Instant Access)</span>
+            <span>
+              {email ? `Instant Access as ${email}` : 'Enter Demo Mode (Instant Access)'}
+            </span>
             <ArrowRight className="w-4 h-4" />
           </button>
 
@@ -171,7 +182,7 @@ export const LoginPage: React.FC = () => {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     className="w-full bg-slate-950 border border-slate-800 text-slate-200 pl-9 pr-3 py-2.5 rounded-xl focus:outline-none focus:border-indigo-500 transition-colors"
-                    placeholder="Hrithik Sharma"
+                    placeholder="Alex Morgan"
                   />
                 </div>
               </div>

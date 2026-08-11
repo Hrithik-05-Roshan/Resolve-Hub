@@ -64,8 +64,8 @@ export class MockShopifyConnector implements EcommerceConnector {
   private mockCustomer: UnifiedCustomer = {
     id: 'cust_sh_demo_882',
     platform: 'shopify',
-    name: 'Hrithik',
-    email: 'hrithikrocks124@gmail.com',
+    name: 'Customer',
+    email: 'customer@store.com',
     addresses: [
       {
         address1: '42 Tech Park Avenue',

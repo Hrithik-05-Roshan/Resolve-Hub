@@ -1,9 +1,9 @@
 import { Platform, Order, Issue, AuditLogEntry, AppNotification, DemoScenario, UserProfile } from '../types';
 
 export const INITIAL_USER: UserProfile = {
-  id: 'usr_hrithik_882',
-  name: 'Hrithik',
-  email: 'hrithikrocks124@gmail.com',
+  id: 'usr_member_101',
+  name: 'Workspace Member',
+  email: 'member@resolvehub.ai',
   connectedPlatformsCount: 4,
   autoRefundThreshold: 1000,
   notificationsEnabled: true,

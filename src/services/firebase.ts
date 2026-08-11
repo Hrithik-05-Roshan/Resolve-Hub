@@ -119,9 +119,31 @@ export const signInWithEmail = async (email: string, pass: string) => {
     return res.user;
   } catch (err: any) {
     if (err?.code === 'auth/user-not-found' || err?.code === 'auth/invalid-credential') {
-      // Try auto-registration for streamlined demo / email login experience
-      const newRes = await createUserWithEmailAndPassword(auth, email, pass);
-      return newRes.user;
+      try {
+        // Try auto-registration for streamlined login experience
+        const newRes = await createUserWithEmailAndPassword(auth, email, pass);
+        return newRes.user;
+      } catch (createErr: any) {
+        if (createErr?.code === 'auth/email-already-in-use') {
+          // Password was incorrect for existing user
+          throw new Error('Incorrect password for this email address. Please check and try again.');
+        }
+        throw createErr;
+      }
+    }
+    throw err;
+  }
+};
+
+export const registerWithEmail = async (email: string, pass: string) => {
+  try {
+    const res = await createUserWithEmailAndPassword(auth, email, pass);
+    return res.user;
+  } catch (err: any) {
+    if (err?.code === 'auth/email-already-in-use') {
+      // User already exists, attempt sign in
+      const signRes = await signInWithEmailAndPassword(auth, email, pass);
+      return signRes.user;
     }
     throw err;
   }
