@@ -15,41 +15,41 @@ export const PlatformBadge: React.FC<PlatformBadgeProps> = ({
 }) => {
   const norm = platform.toLowerCase();
 
-  let bg = 'bg-slate-800 text-slate-300 border-slate-700';
-  let icon = <ShoppingBag className="w-4 h-4" />;
+  let bg = 'bg-slate-900 text-slate-200 border-slate-700';
+  let icon = <ShoppingBag className="w-3.5 h-3.5 text-slate-300" />;
   let label = platform;
 
   if (norm.includes('shopify')) {
-    bg = 'bg-emerald-950/80 text-emerald-400 border-emerald-700/60';
-    icon = <ShoppingBag className="w-4 h-4 text-emerald-400" />;
+    bg = 'bg-emerald-950/90 text-emerald-300 border-emerald-600/60 shadow-sm shadow-emerald-950/50';
+    icon = <ShoppingBag className="w-3.5 h-3.5 text-emerald-400" />;
     label = 'Shopify';
   } else if (norm.includes('swiggy')) {
-    bg = 'bg-orange-950/60 text-orange-400 border-orange-800/50';
-    icon = <UtensilsCrossed className="w-4 h-4" />;
+    bg = 'bg-orange-950/90 text-orange-300 border-orange-600/60 shadow-sm shadow-orange-950/50';
+    icon = <UtensilsCrossed className="w-3.5 h-3.5 text-orange-400" />;
     label = 'Swiggy';
   } else if (norm.includes('amazon')) {
-    bg = 'bg-amber-950/60 text-amber-400 border-amber-800/50';
-    icon = <ShoppingBag className="w-4 h-4" />;
+    bg = 'bg-amber-950/90 text-amber-300 border-amber-600/60 shadow-sm shadow-amber-950/50';
+    icon = <ShoppingBag className="w-3.5 h-3.5 text-amber-400" />;
     label = 'Amazon';
   } else if (norm.includes('zomato')) {
-    bg = 'bg-rose-950/60 text-rose-400 border-rose-800/50';
-    icon = <Pizza className="w-4 h-4" />;
+    bg = 'bg-rose-950/90 text-rose-300 border-rose-600/60 shadow-sm shadow-rose-950/50';
+    icon = <Pizza className="w-3.5 h-3.5 text-rose-400" />;
     label = 'Zomato';
   } else if (norm.includes('flipkart')) {
-    bg = 'bg-blue-950/60 text-blue-400 border-blue-800/50';
-    icon = <Package className="w-4 h-4" />;
+    bg = 'bg-blue-950/90 text-blue-300 border-blue-600/60 shadow-sm shadow-blue-950/50';
+    icon = <Package className="w-3.5 h-3.5 text-blue-400" />;
     label = 'Flipkart';
   } else if (norm.includes('uber')) {
-    bg = 'bg-neutral-900 text-neutral-200 border-neutral-700';
-    icon = <Car className="w-4 h-4" />;
+    bg = 'bg-neutral-900 text-neutral-200 border-neutral-700 shadow-sm shadow-neutral-950/50';
+    icon = <Car className="w-3.5 h-3.5 text-neutral-300" />;
     label = 'Uber';
   } else if (norm.includes('myntra')) {
-    bg = 'bg-pink-950/60 text-pink-400 border-pink-800/50';
-    icon = <Shirt className="w-4 h-4" />;
+    bg = 'bg-pink-950/90 text-pink-300 border-pink-600/60 shadow-sm shadow-pink-950/50';
+    icon = <Shirt className="w-3.5 h-3.5 text-pink-400" />;
     label = 'Myntra';
   } else if (norm.includes('meesho')) {
-    bg = 'bg-fuchsia-950/60 text-fuchsia-400 border-fuchsia-800/50';
-    icon = <Tag className="w-4 h-4" />;
+    bg = 'bg-fuchsia-950/90 text-fuchsia-300 border-fuchsia-600/60 shadow-sm shadow-fuchsia-950/50';
+    icon = <Tag className="w-3.5 h-3.5 text-fuchsia-400" />;
     label = 'Meesho';
   }
 
@@ -61,7 +61,7 @@ export const PlatformBadge: React.FC<PlatformBadgeProps> = ({
 
   return (
     <span
-      className={`inline-flex items-center font-medium rounded-full border shadow-sm ${bg} ${sizeClasses[size]}`}
+      className={`inline-flex items-center font-bold rounded-full border ${bg} ${sizeClasses[size]}`}
     >
       {icon}
       {showName && <span>{label}</span>}

@@ -28,12 +28,12 @@ export const Header: React.FC = () => {
         <button
           onClick={toggleTheme}
           title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
-          className="p-2 rounded-lg bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-300 hover:text-amber-400 transition-all cursor-pointer flex items-center justify-center"
+          className="p-2 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-indigo-400 dark:hover:border-slate-700 text-slate-700 dark:text-slate-300 hover:text-amber-500 dark:hover:text-amber-400 transition-all cursor-pointer flex items-center justify-center shadow-xs"
         >
           {theme === 'dark' ? (
             <Sun className="w-4 h-4 text-amber-400 animate-pulse" />
           ) : (
-            <Moon className="w-4 h-4 text-indigo-500" />
+            <Moon className="w-4 h-4 text-indigo-600" />
           )}
         </button>
 
@@ -47,7 +47,7 @@ export const Header: React.FC = () => {
         <div className="relative">
           <button
             onClick={() => setShowUserMenu(!showUserMenu)}
-            className="flex items-center gap-2 p-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:border-slate-700 transition-all cursor-pointer"
+            className="flex items-center gap-2 p-1.5 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-indigo-400 dark:hover:border-slate-700 transition-all cursor-pointer shadow-xs"
           >
             {currentUser.photoURL ? (
               <img
@@ -57,11 +57,11 @@ export const Header: React.FC = () => {
                 className="w-7 h-7 rounded-full object-cover border border-indigo-500/40"
               />
             ) : (
-              <div className="w-7 h-7 rounded-full bg-indigo-600/30 text-indigo-400 border border-indigo-500/30 flex items-center justify-center font-bold text-xs">
+              <div className="w-7 h-7 rounded-full bg-indigo-100 dark:bg-indigo-600/30 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/30 flex items-center justify-center font-bold text-xs">
                 {currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'U'}
               </div>
             )}
-            <span className="text-xs font-medium text-slate-200 hidden md:inline-block pr-1">
+            <span className="text-xs font-bold text-slate-800 dark:text-slate-200 hidden md:inline-block pr-1">
               {currentUser.name}
             </span>
           </button>

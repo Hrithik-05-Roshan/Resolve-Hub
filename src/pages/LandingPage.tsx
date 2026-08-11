@@ -1,17 +1,28 @@
 import React from 'react';
-import { Sparkles, ShieldCheck, Zap, ArrowRight, Layers, CheckCircle2, Bot, Cpu, Play } from 'lucide-react';
+import { Sparkles, ShieldCheck, ArrowRight, Bot, Cpu, Play } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { DemoScenarioBar } from '../components/common/DemoScenarioBar';
 
 export const LandingPage: React.FC = () => {
-  const { navigate, loginAsDemo } = useApp();
+  const { navigate, isLoggedIn } = useApp();
+
+  const handleStart = (targetPage: string = 'dashboard') => {
+    if (isLoggedIn) {
+      navigate(targetPage);
+    } else {
+      navigate('login');
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#0B0F17] text-slate-100 flex flex-col font-sans">
       {/* Top Nav */}
       <header className="h-20 border-b border-slate-800/80 px-6 max-w-7xl mx-auto w-full flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white font-black text-xl shadow-lg shadow-indigo-500/30">
+        <div
+          onClick={() => navigate('landing')}
+          className="flex items-center gap-3 cursor-pointer group"
+        >
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white font-black text-xl shadow-lg shadow-indigo-500/30 group-hover:scale-105 transition-transform">
             R
           </div>
           <span className="font-bold text-xl tracking-tight">
@@ -20,19 +31,31 @@ export const LandingPage: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-4">
-          <button
-            onClick={() => navigate('login')}
-            className="text-xs font-semibold text-slate-300 hover:text-white transition-colors cursor-pointer"
-          >
-            Sign In
-          </button>
-          <button
-            onClick={loginAsDemo}
-            className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white shadow-lg shadow-indigo-600/30 transition-all cursor-pointer flex items-center gap-2"
-          >
-            <span>Try ResolveHub</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </button>
+          {isLoggedIn ? (
+            <button
+              onClick={() => navigate('dashboard')}
+              className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white shadow-lg shadow-indigo-600/30 transition-all cursor-pointer flex items-center gap-2"
+            >
+              <span>Go to Dashboard</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          ) : (
+            <>
+              <button
+                onClick={() => navigate('login')}
+                className="text-xs font-semibold text-slate-300 hover:text-white transition-colors cursor-pointer"
+              >
+                Sign In
+              </button>
+              <button
+                onClick={() => navigate('login')}
+                className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white shadow-lg shadow-indigo-600/30 transition-all cursor-pointer flex items-center gap-2"
+              >
+                <span>Get Started</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </>
+          )}
         </div>
       </header>
 
@@ -57,17 +80,14 @@ export const LandingPage: React.FC = () => {
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
             <button
-              onClick={loginAsDemo}
+              onClick={() => handleStart('dashboard')}
               className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-sm font-bold text-white shadow-xl shadow-indigo-600/30 transition-all cursor-pointer flex items-center justify-center gap-2"
             >
-              <span>Explore Live Prototype</span>
+              <span>Explore Live Workspace</span>
               <ArrowRight className="w-4 h-4" />
             </button>
             <button
-              onClick={() => {
-                loginAsDemo();
-                navigate('raise_issue');
-              }}
+              onClick={() => handleStart('raise_issue')}
               className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-slate-900 border border-slate-800 hover:bg-slate-800 text-sm font-semibold text-slate-200 transition-all cursor-pointer flex items-center justify-center gap-2"
             >
               <Play className="w-4 h-4 text-indigo-400" />

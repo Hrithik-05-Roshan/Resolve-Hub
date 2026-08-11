@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Settings, Shield, Bell, Cpu, Save, RefreshCw, Key, Sun, Moon, Palette } from 'lucide-react';
+import { Settings, Shield, Bell, Cpu, Save, RefreshCw } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 
 export const SettingsPage: React.FC = () => {
-  const { currentUser, updateSettings, resetToInitialData, theme, setTheme } = useApp();
+  const { currentUser, updateSettings, resetToInitialData } = useApp();
   const [threshold, setThreshold] = useState(currentUser.autoRefundThreshold || 1000);
   const [notificationsEnabled, setNotificationsEnabled] = useState(currentUser.notificationsEnabled);
   const [autoExecuteEnabled, setAutoExecuteEnabled] = useState(currentUser.autoExecuteEnabled);
@@ -43,7 +43,7 @@ export const SettingsPage: React.FC = () => {
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
             <div>
-              <label className="block text-slate-400 mb-1 font-medium">Name</label>
+              <label className="block text-slate-400 mb-1 font-medium font-sans">Name</label>
               <input
                 type="text"
                 value={currentUser.name}
@@ -52,7 +52,7 @@ export const SettingsPage: React.FC = () => {
               />
             </div>
             <div>
-              <label className="block text-slate-400 mb-1 font-medium">Email Address</label>
+              <label className="block text-slate-400 mb-1 font-medium font-sans">Email Address</label>
               <input
                 type="text"
                 value={currentUser.email}
@@ -116,51 +116,6 @@ export const SettingsPage: React.FC = () => {
                 />
               </label>
             </div>
-          </div>
-        </div>
-
-        {/* Theme Preferences */}
-        <div className="p-6 rounded-3xl bg-slate-900 border border-slate-800 space-y-4">
-          <h3 className="text-sm font-bold text-slate-200 uppercase tracking-wider flex items-center gap-2">
-            <Palette className="w-4 h-4 text-amber-400" /> Interface Theme Mode
-          </h3>
-
-          <div className="grid grid-cols-2 gap-4 text-xs">
-            <button
-              type="button"
-              onClick={() => setTheme('dark')}
-              className={`p-4 rounded-2xl border text-left transition-all cursor-pointer flex items-center gap-3 ${
-                theme === 'dark'
-                  ? 'bg-slate-950 border-indigo-500 ring-2 ring-indigo-500/30 text-white'
-                  : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
-              }`}
-            >
-              <div className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-indigo-400">
-                <Moon className="w-5 h-5" />
-              </div>
-              <div>
-                <span className="font-bold text-slate-100 block">Dark Luxury</span>
-                <span className="text-[11px] text-slate-400">High-contrast dark obsidian canvas</span>
-              </div>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setTheme('light')}
-              className={`p-4 rounded-2xl border text-left transition-all cursor-pointer flex items-center gap-3 ${
-                theme === 'light'
-                  ? 'bg-slate-100 border-indigo-500 ring-2 ring-indigo-500/30 text-slate-900'
-                  : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
-              }`}
-            >
-              <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-500">
-                <Sun className="w-5 h-5" />
-              </div>
-              <div>
-                <span className="font-bold text-slate-900 block">Clean Light</span>
-                <span className="text-[11px] text-slate-500">Crisp high-readability daylight canvas</span>
-              </div>
-            </button>
           </div>
         </div>
 

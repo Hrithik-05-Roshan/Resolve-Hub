@@ -67,12 +67,10 @@ interface AppContextType {
   loginAsDemo: () => void;
   loginWithGoogleProvider: () => Promise<void>;
   loginWithEmail: (email: string, pass: string) => Promise<void>;
+  signUpWithEmail: (email: string, pass: string, name?: string) => Promise<void>;
   logout: () => void;
   resetToInitialData: () => void;
   triggerDemoScenario: (scenarioId: string) => Promise<void>;
-  theme: 'dark' | 'light';
-  toggleTheme: () => void;
-  setTheme: (theme: 'dark' | 'light') => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -112,37 +110,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   });
 
   const [activeIssue, setActiveIssue] = useState<Issue | null>(null);
-  const [activePage, setActivePage] = useState<string>('dashboard');
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(true);
+  const [activePage, setActivePage] = useState<string>('landing');
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [activeFilterPlatform, setActiveFilterPlatform] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [isProcessingAI, setIsProcessingAI] = useState<boolean>(false);
   const [processingStepIndex, setProcessingStepIndex] = useState<number>(0);
 
-  // Theme State ('dark' | 'light')
-  const [theme, setThemeState] = useState<'dark' | 'light'>(() => {
-    const savedTheme = localStorage.getItem('resolvehub_theme');
-    return savedTheme === 'light' ? 'light' : 'dark';
-  });
-
+  // Enforce dark mode class on document
   useEffect(() => {
-    localStorage.setItem('resolvehub_theme', theme);
-    if (theme === 'light') {
-      document.documentElement.classList.add('light');
-      document.documentElement.classList.remove('dark');
-    } else {
-      document.documentElement.classList.add('dark');
-      document.documentElement.classList.remove('light');
-    }
-  }, [theme]);
-
-  const toggleTheme = () => {
-    setThemeState((prev) => (prev === 'dark' ? 'light' : 'dark'));
-  };
-
-  const setTheme = (newTheme: 'dark' | 'light') => {
-    setThemeState(newTheme);
-  };
+    document.documentElement.classList.add('dark');
+    document.documentElement.classList.remove('light');
+  }, []);
 
   // Test Firestore Connection on App Init
   useEffect(() => {
@@ -158,8 +137,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         const isGoogle = user.providerData?.some((p) => p.providerId.includes('google'));
         const userProfile: UserProfile = {
           id: user.uid,
-          name: user.displayName || user.email?.split('@')[0] || 'Hrithik',
-          email: user.email || 'hrithikrocks124@gmail.com',
+          name: user.displayName || user.email?.split('@')[0] || 'Member',
+          email: user.email || '',
           photoURL: user.photoURL || undefined,
           authProvider: isGoogle ? 'google' : 'email',
           connectedPlatformsCount: 4,
@@ -183,6 +162,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           console.warn('Firestore User Sync Notice:', error);
           setCurrentUser(userProfile);
         }
+      } else {
+        setIsLoggedIn(false);
       }
     });
 
@@ -215,12 +196,22 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [notifications]);
 
   const navigate = (page: string) => {
+    // If attempting to access protected app views while unauthenticated, direct to login
+    const protectedPages = ['dashboard', 'connections', 'orders', 'raise_issue', 'resolution_center', 'history', 'audit_log', 'settings'];
+    if (!isLoggedIn && protectedPages.includes(page)) {
+      setActivePage('login');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
     setActivePage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const loginAsDemo = () => {
     setIsLoggedIn(true);
+    const demoProfile: UserProfile = { ...INITIAL_USER, name: 'Demo Member' };
+    setCurrentUser(demoProfile);
     setActivePage('dashboard');
   };
 
@@ -252,8 +243,35 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setActivePage('dashboard');
       }
     } catch (error: any) {
-      console.warn('Email auth notice, falling back to instant access:', error);
-      loginAsDemo();
+      console.warn('Email auth notice:', error);
+      throw error;
+    }
+  };
+
+  const signUpWithEmail = async (email: string, pass: string, name?: string) => {
+    try {
+      const user = await signInWithEmail(email, pass);
+      if (user) {
+        const userProfile: UserProfile = {
+          id: user.uid,
+          name: name || email.split('@')[0] || 'User',
+          email: email,
+          authProvider: 'email',
+          connectedPlatformsCount: 4,
+          autoRefundThreshold: 1000,
+          notificationsEnabled: true,
+          autoExecuteEnabled: true,
+          humanEscalationEnabled: true,
+        };
+        const userDocRef = doc(db, 'users', user.uid);
+        await setDoc(userDocRef, userProfile, { merge: true });
+        setCurrentUser(userProfile);
+        setIsLoggedIn(true);
+        setActivePage('dashboard');
+      }
+    } catch (error: any) {
+      console.warn('Sign Up notice:', error);
+      throw error;
     }
   };
 
@@ -663,12 +681,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         loginAsDemo,
         loginWithGoogleProvider,
         loginWithEmail,
+        signUpWithEmail,
         logout,
         resetToInitialData,
         triggerDemoScenario,
-        theme,
-        toggleTheme,
-        setTheme,
       }}
     >
       {children}
